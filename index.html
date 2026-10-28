@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Aves de Río Negro: Realidad Aumentada - ESRN Rural Virtual</title>
   <link rel="stylesheet" href="css/styles.css">
+  <!-- A-Frame y MindAR Scripts -->
   <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 </head>
@@ -16,6 +17,7 @@
   </header>
 
   <main>
+    <!-- VISTA INICIO -->
     <section id="home-view" class="view active">
       <div class="hero-card">
         <h2>Descubrí la Biodiversidad Patagónica</h2>
@@ -33,31 +35,50 @@
         <ol style="padding-left: 1.2rem; color: var(--text-light);">
           <li>Imprimí las tarjetas desde la sección de generador.</li>
           <li>Presioná en «Iniciar Realidad Aumentada» y otorgá permisos de cámara.</li>
-          <li>Enfoca cualquier tarjeta con tu celular para ver el ave en AR y escuchar su canto offline.</li>
+          <li>Enfoca cualquier tarjeta con tu celular para ver el ave en AR y escuchar su canto.</li>
         </ol>
       </div>
     </section>
 
+    <!-- VISTA REALIDAD AUMENTADA (ESTÁTICA) -->
     <section id="ar-view" class="view">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
         <h3 style="color: var(--primary-dark); font-size: 1.1rem;">Visor de Realidad Aumentada</h3>
         <button id="btn-back-home" class="btn-secondary" style="margin: 0; padding: 0.4rem 0.8rem; font-size: 0.8rem;">Salir al Inicio</button>
       </div>
-      <div id="ar-container"></div>
+      
+      <div id="ar-container">
+        <!-- Escena estática para que A-Frame y MindAR carguen correctamente -->
+        <a-scene id="ar-scene" mindar-image="imageTargetSrc: assets/targets/targets.mind; autoStart: false; uiScanning: yes;" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+          <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+          <a-entity mindar-image-target="targetIndex: 0">
+            <a-plane position="0 0 0" height="0.55" width="1" rotation="0 0 0" material="src: https://upload.wikimedia.org/wikipedia/commons/9/98/Pitangus_sulphuratus_-_Benteveo_-_Great_Kiskadee.jpg; transparent: true; opacity: 0.95;"></a-plane>
+          </a-entity>
+        </a-scene>
+
+        <div class="ar-ui-overlay">
+          <div class="ar-status" id="ar-status-text">Buscando tarjeta impresa...</div>
+          <div class="ar-bird-title" id="ar-bird-name">Enfoca con la cámara</div>
+          <div class="ar-buttons">
+            <button class="btn-secondary" onclick="openBirdModal('benteveo')" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">Ver Ficha</button>
+          </div>
+        </div>
+      </div>
     </section>
 
+    <!-- VISTA GALERÍA Y BUSCADOR -->
     <section id="gallery-view" class="view">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
         <h3 style="color: var(--primary-dark);">Catálogo de Especies</h3>
         <button id="btn-back-home-2" class="btn-secondary" style="margin: 0; padding: 0.4rem 0.8rem; font-size: 0.8rem;">Volver</button>
       </div>
       
-      <input type="text" id="search-input" class="search-bar" placeholder="Buscar por nombre común o científico (ej. Benteveo, Tero)...">
-
+      <input type="text" id="search-input" class="search-bar" placeholder="Buscar por nombre común o científico...">
       <div id="birds-container" class="birds-grid"></div>
     </section>
   </main>
 
+  <!-- MODAL DE FICHA Y AUDIO -->
   <div id="bird-modal" class="modal">
     <div class="modal-content">
       <div class="modal-header">

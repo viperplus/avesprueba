@@ -8,7 +8,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 let currentAudio = null;
-let mediaStream = null;
 
 function initApp() {
   renderGallery();
@@ -18,7 +17,7 @@ function initApp() {
 function setupEventListeners() {
   document.getElementById("btn-start-ar").addEventListener("click", () => {
     switchView("ar-view");
-    initARScanner();
+    startARScanner();
   });
 
   document.getElementById("btn-gallery").addEventListener("click", () => {
@@ -138,52 +137,24 @@ window.stopAudio = function() {
   }
 };
 
-// Inicialización robusta del visor AR y permisos de cámara
-let arInitialized = false;
-
-function initARScanner() {
-  const arContainer = document.getElementById("ar-container");
-  if (arInitialized) return;
-
-  // Verificamos permisos y forzamos el encendido de video HTML5 previo
-  navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-    .then((stream) => {
-      mediaStream = stream;
-      
-      arContainer.innerHTML = `
-        <a-scene mindar-image="imageTargetSrc: assets/targets/targets.mind; autoStart: true; uiScanning: yes;" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
-          <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
-          <a-entity mindar-image-target="targetIndex: 0">
-            <a-plane position="0 0 0" height="0.55" width="1" rotation="0 0 0" material="src: https://upload.wikimedia.org/wikipedia/commons/9/98/Pitangus_sulphuratus_-_Benteveo_-_Great_Kiskadee.jpg; transparent: true; opacity: 0.95;"></a-plane>
-          </a-entity>
-        </a-scene>
-        <div class="ar-ui-overlay">
-          <div class="ar-status" id="ar-status-text">Cámara activa • Buscando tarjeta...</div>
-          <div class="ar-bird-title" id="ar-bird-name">Enfoca con la cámara</div>
-          <div class="ar-buttons">
-            <button class="btn-secondary" onclick="openBirdModal('benteveo')" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">Ver Ficha</button>
-          </div>
-        </div>
-      `;
-      arInitialized = true;
-    })
-    .catch((error) => {
-      console.error("Error al acceder a la cámara:", error);
-      arContainer.innerHTML = `
-        <div style="padding: 2rem; text-align: center; color: white;">
-          <h3>No se pudo acceder a la cámara</h3>
-          <p style="font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.8;">Verificá los permisos de tu navegador o asegurate de estar ingresando mediante el enlace HTTPS de GitHub Pages.</p>
-        </div>
-      `;
-    });
+// Control limpio del sistema MindAR estático
+function startARScanner() {
+  const sceneEl = document.getElementById("ar-scene");
+  if (sceneEl && sceneEl.systems["mindar-image-system"]) {
+    sceneEl.systems["mindar-image-system"].start();
+  } else if (sceneEl) {
+    // Si la escena recién carga, le damos un breve delay para iniciar el sistema AR
+    setTimeout(() => {
+      if (sceneEl.systems["mindar-image-system"]) {
+        sceneEl.systems["mindar-image-system"].start();
+      }
+    }, 500);
+  }
 }
 
 function stopARScanner() {
-  if (mediaStream) {
-    mediaStream.getTracks().forEach(track => track.stop());
-    mediaStream = null;
+  const sceneEl = document.getElementById("ar-scene");
+  if (sceneEl && sceneEl.systems["mindar-image-system"]) {
+    sceneEl.systems["mindar-image-system"].stop();
   }
-  const arContainer = document.getElementById("ar-container");
-  arContainer.innerHTML = "";
-  arInitialized = false;
 }
