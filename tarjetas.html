@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generador de Tarjetas AR - Aves de Río Negro</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    @media print {
+      body { background: white; }
+      header, .no-print { display: none !important; }
+      .card-print-page { page-break-after: always; box-shadow: none !important; border: 1px solid #ccc; }
+    }
+    .card-print-page {
+      background: white;
+      width: 100%;
+      max-width: 210mm;
+      min-height: 297mm;
+      margin: 1rem auto;
+      padding: 20mm;
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      text-align: center;
+    }
+    .marker-box {
+      width: 220px;
+      height: 220px;
+      border: 3px dashed var(--primary-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 1.5rem 0;
+      background: #fafafa;
+    }
+    .marker-box img {
+      max-width: 90%;
+      max-height: 90%;
+      object-fit: contain;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Generador de Tarjetas Impresas para Realidad Aumentada</h1>
+    <p>ESRN Rural Virtual - Río Negro</p>
+  </header>
+
+  <main style="text-align: center;">
+    <div class="no-print" style="margin: 1.5rem 0;">
+      <button class="btn-primary" onclick="window.print()">Imprimir Tarjetas (Formato A4)</button>
+      <a href="index.html" class="btn-secondary">Volver al Inicio</a>
+    </div>
+
+    <div id="print-container">
+      <!-- Se generan dinámicamente mediante JS -->
+    </div>
+  </main>
+
+  <script src="js/aves.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const container = document.getElementById("print-container");
+      
+      avesData.forEach((bird, index) => {
+        const pageDiv = document.createElement("div");
+        pageDiv.className = "card-print-page";
+        pageDiv.innerHTML = `
+          <div>
+            <h2 style="color: #2c5e3b; font-size: 1.8rem; margin-bottom: 0.3rem;">${bird.nombreComun}</h2>
+            <i style="font-size: 1.2rem; color: #555;">${bird.nombreCientifico}</i>
+          </div>
+
+          <div class="marker-box">
+            <img src="${bird.imagenUrl}" alt="Marcador ${bird.nombreComun}">
+          </div>
+
+          <div style="max-width: 400px; font-size: 0.95rem; color: #444;">
+            <p><strong>Instrucción:</strong> Enfocá esta tarjeta con la cámara de tu celular en la aplicación WebAR para activar la experiencia, escuchar su canto y ver la ficha.</p>
+            <p style="margin-top: 0.8rem; font-size: 0.8rem; color: #777;">ESRN Rural Virtual • Tarjeta #${index + 1} de 21</p>
+          </div>
+        `;
+        container.appendChild(pageDiv);
+      });
+    });
+  </script>
+</body>
+</html>
